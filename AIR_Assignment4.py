@@ -22,18 +22,17 @@ def preProcessing(content):
 	return tokens
 
 def buildIndex(index, doc_id, tokens):
-	print(tokens)
 	for word in tokens:
-		print(word)
 		if(word not in index):
-			index[word] = [{doc_id:1}]
+			index[word] = {doc_id:1}
 		else:
-			list = index[word]
-			for i in range(len(list)):
-				if(doc_id in list[i]):
-					# print(list[i])
-					
-	print(len(index))
+			# print(word,index[word],doc_id)
+			# print(type(index[word]))
+			if(doc_id in index[word].keys()):
+				index[word][doc_id] = index[word][doc_id]+1
+			else:
+				index[word][doc_id] = 1
+		# print(index)
 	return index
 
 def main():
@@ -48,12 +47,12 @@ def main():
 	index = {}
 	for i in range(len(doc)):
 		doc_id = doc[i].split('.T')[0]
-		print(doc_id)
+		# print(doc_id)
 		content = doc[i].split('.W')[1]
 		tokens = preProcessing(content)
-		index = buildIndex(index, doc_id, tokens)
+		index = buildIndex(index, int(doc_id), tokens)
 	
-	print(index['samrat'])		
+	print(index)		
 
 
 main()
