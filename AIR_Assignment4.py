@@ -9,7 +9,7 @@ from nltk.corpus import stopwords
 stemmer = PorterStemmer()
 
 stop_words = set(stopwords.words('english'))
-# print(stop)
+
 def stem(word):
 	return stemmer.stem(word)
 
@@ -24,15 +24,13 @@ def preProcessing(content):
 def buildIndex(index, doc_id, tokens):
 	for word in tokens:
 		if(word not in index):
-			index[word] = {doc_id:1}
+			index[word] = [1,{doc_id:1}]
 		else:
-			# print(word,index[word],doc_id)
-			# print(type(index[word]))
-			if(doc_id in index[word].keys()):
-				index[word][doc_id] = index[word][doc_id]+1
+			if(doc_id in index[word][1].keys()):
+				index[word][1][doc_id] = index[word][1][doc_id]+1
 			else:
-				index[word][doc_id] = 1
-		# print(index)
+				index[word][0] = index[word][0] + 1
+				index[word][1][doc_id] = 1
 	return index
 
 def main():
@@ -47,7 +45,6 @@ def main():
 	index = {}
 	for i in range(len(doc)):
 		doc_id = doc[i].split('.T')[0]
-		# print(doc_id)
 		content = doc[i].split('.W')[1]
 		tokens = preProcessing(content)
 		index = buildIndex(index, int(doc_id), tokens)
