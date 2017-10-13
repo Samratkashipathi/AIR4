@@ -24,13 +24,23 @@ def preProcessing(content):
 def buildIndex(index, doc_id, tokens):
 	for word in tokens:
 		if(word not in index):
-			index[word] = [1,{doc_id:1}]
+			# index[word] = [1,{doc_id:1}]
+
+			#df,tf,{doc_id:frequency}
+			index[word] = [1,1,{doc_id:1}]
 		else:
-			if(doc_id in index[word][1].keys()):
-				index[word][1][doc_id] = index[word][1][doc_id]+1
+			if(doc_id in index[word][2].keys()):
+				index[word][2][doc_id] = index[word][2][doc_id]+1
+				index[word][1] = index[word][1]+1
+
+				# index[word][1][doc_id] = index[word][1][doc_id]+1
 			else:
 				index[word][0] = index[word][0] + 1
-				index[word][1][doc_id] = 1
+				index[word][1] = index[word][1]+1
+				index[word][2][doc_id] = 1
+
+				# index[word][0] = index[word][0] + 1
+				# index[word][1][doc_id] = 1
 	return index
 
 def main():
@@ -42,6 +52,7 @@ def main():
 
 	doc = data.split('.I')
 	del(doc[0])
+	print('Total Documents:',len(doc))
 	index = {}
 	for i in range(len(doc)):
 		doc_id = doc[i].split('.T')[0]
@@ -49,7 +60,9 @@ def main():
 		tokens = preProcessing(content)
 		index = buildIndex(index, int(doc_id), tokens)
 	
-	print(index)		
-
+	# print(index)	
+	# print(stem('boundary'),index[stem('boundary')])	
+	query = input('Enter the Query:')
+	# print(query)
 
 main()
