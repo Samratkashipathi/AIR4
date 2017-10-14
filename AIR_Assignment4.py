@@ -65,7 +65,7 @@ def main():
 	# print(stem('boundary'),index[stem('boundary')])	
 	# query = input('Enter the Query:')
 	query = 'boundary layer in simple layer'
-	# print(query)
+	print(query)
 	words_in_query = query.split(' ')
 	words_in_query = list(filter(lambda x : x not in stop_words,words_in_query))
 	words_in_query = list(map(stem,words_in_query))
