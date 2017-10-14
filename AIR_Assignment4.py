@@ -1,5 +1,6 @@
 import nltk
 import string
+import math
 from nltk.stem.porter import *
 from nltk import word_tokenize
 from nltk.corpus.reader.util import *
@@ -60,9 +61,32 @@ def main():
 		tokens = preProcessing(content)
 		index = buildIndex(index, int(doc_id), tokens)
 	
-	# print(index)	
+	print(index)	
 	# print(stem('boundary'),index[stem('boundary')])	
-	query = input('Enter the Query:')
+	# query = input('Enter the Query:')
+	query = 'boundary layer in simple layer'
 	# print(query)
+	words_in_query = query.split(' ')
+	words_in_query = list(filter(lambda x : x not in stop_words,words_in_query))
+	words_in_query = list(map(stem,words_in_query))
+	print(words_in_query)
+	term_frequency_query = {}
+	for word in words_in_query:
+		if(word in term_frequency_query.keys()):
+			term_frequency_query[word] = term_frequency_query[word] + 1
+		else:
+			term_frequency_query[word] = 1
+	print(term_frequency_query)
+
+	inverse_document_frequency = {}
+	tf_idf_query = {}
+	for key in term_frequency_query.keys():
+		print(key,index[key])
+		term_frequency_query[key] = 1+math.log10(term_frequency_query[key])
+		inverse_document_frequency[key] = math.log10(index[key][0])
+		tf_idf_query[key] = term_frequency_query[key] * inverse_document_frequency[key]
+	print(term_frequency_query)
+	print(inverse_document_frequency)
+	print(tf_idf_query)
 
 main()
