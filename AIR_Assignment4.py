@@ -33,13 +33,11 @@ def buildIndex(index, doc_id, tokens):
 			if(doc_id in index[word][2].keys()):
 				index[word][2][doc_id] = index[word][2][doc_id]+1
 				index[word][1] = index[word][1]+1
-
 				# index[word][1][doc_id] = index[word][1][doc_id]+1
 			else:
 				index[word][0] = index[word][0] + 1
 				index[word][1] = index[word][1]+1
 				index[word][2][doc_id] = 1
-
 				# index[word][0] = index[word][0] + 1
 				# index[word][1][doc_id] = 1
 	return index
@@ -47,7 +45,7 @@ def buildIndex(index, doc_id, tokens):
 def main():
 	# file_name = 'cran.all.1400'
 	file_name = 'test.all.1'
-
+	
 	with open(file_name) as f:
 	    data = f.read()
 
@@ -60,6 +58,7 @@ def main():
 		content = doc[i].split('.W')[1]
 		tokens = preProcessing(content)
 		index = buildIndex(index, int(doc_id), tokens)
+
 	
 	print(index)	
 	# print(stem('boundary'),index[stem('boundary')])	
@@ -78,15 +77,17 @@ def main():
 			term_frequency_query[word] = 1
 	print(term_frequency_query)
 
+
 	inverse_document_frequency = {}
 	tf_idf_query = {}
 	for key in term_frequency_query.keys():
 		print(key,index[key])
 		term_frequency_query[key] = 1+math.log10(term_frequency_query[key])
-		inverse_document_frequency[key] = math.log10(index[key][0])
+		inverse_document_frequency[key] = math.log10(len(doc)/index[key][0])
 		tf_idf_query[key] = term_frequency_query[key] * inverse_document_frequency[key]
 	print(term_frequency_query)
 	print(inverse_document_frequency)
 	print(tf_idf_query)
+
 
 main()
