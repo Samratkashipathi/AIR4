@@ -6,6 +6,7 @@ from nltk import word_tokenize
 from nltk.corpus.reader.util import *
 from nltk.corpus.reader.api import *
 from nltk.corpus import stopwords
+from array import array
 
 stemmer = PorterStemmer()
 
@@ -77,7 +78,7 @@ def main():
 			term_frequency_query[word] = 1
 	print(term_frequency_query)
 
-
+	score = [0] * (len(doc)+1)
 	inverse_document_frequency = {}
 	tf_idf_query = {}
 	for key in term_frequency_query.keys():
@@ -85,9 +86,17 @@ def main():
 		term_frequency_query[key] = 1+math.log10(term_frequency_query[key])
 		inverse_document_frequency[key] = math.log10(len(doc)/index[key][0])
 		tf_idf_query[key] = term_frequency_query[key] * inverse_document_frequency[key]
-	print(term_frequency_query)
-	print(inverse_document_frequency)
-	print(tf_idf_query)
+
+		#tf idf for documents
+		for d in index[key][2].keys():
+			normalized_tf_doc = 1+math.log10(index[key][2][d])
+			# print(d,index[key][2][d],normalized_tf_doc)
+			score[d] = score[d] + (normalized_tf_doc*tf_idf_query[key])
+
+	print(score)
+	# print(term_frequency_query)
+	# print(inverse_document_frequency)
+	# print(tf_idf_query)
 
 
 main()
