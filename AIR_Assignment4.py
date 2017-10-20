@@ -1,6 +1,8 @@
 import nltk
 import string
 import math
+import numpy as np
+import heapq
 from nltk.stem.porter import *
 from nltk import word_tokenize
 from nltk.corpus.reader.util import *
@@ -44,8 +46,8 @@ def buildIndex(index, doc_id, tokens):
 	return index
 
 def main():
-	# file_name = 'cran.all.1400'
-	file_name = 'test.all.1'
+	file_name = 'cran.all.1400'
+	# file_name = 'test.all.1'
 	
 	with open(file_name) as f:
 	    data = f.read()
@@ -63,8 +65,8 @@ def main():
 	
 	print(index)	
 	# print(stem('boundary'),index[stem('boundary')])	
-	# query = input('Enter the Query:')
-	query = 'boundary layer in simple layer'
+	query = input('Enter the Query:')
+	# query = 'in the study of high speed viscous'
 	print(query)
 	words_in_query = query.split(' ')
 	words_in_query = list(filter(lambda x : x not in stop_words,words_in_query))
@@ -76,27 +78,30 @@ def main():
 			term_frequency_query[word] = term_frequency_query[word] + 1
 		else:
 			term_frequency_query[word] = 1
-	print(term_frequency_query)
+	# print('tf query:',term_frequency_query)
 
-	score = [0] * (len(doc)+1)
+	score = [0.0] * (len(doc)+1)
+	length = [0] * (len(doc)+1)
+
 	inverse_document_frequency = {}
 	tf_idf_query = {}
 	for key in term_frequency_query.keys():
-		print(key,index[key])
+		# print(key,term_frequency_query[key],index[key])
 		term_frequency_query[key] = 1+math.log10(term_frequency_query[key])
 		inverse_document_frequency[key] = math.log10(len(doc)/index[key][0])
 		tf_idf_query[key] = term_frequency_query[key] * inverse_document_frequency[key]
 
-		#tf idf for documents
-		for d in index[key][2].keys():
-			normalized_tf_doc = 1+math.log10(index[key][2][d])
-			# print(d,index[key][2][d],normalized_tf_doc)
-			score[d] = score[d] + (normalized_tf_doc*tf_idf_query[key])
+		#tf-idf for documents
+		for each_doc in index[key][2].keys():
+			# print(each_doc,index[key][2][each_doc])
+			term_frequency_doc = 1 + math.log10(index[key][2][each_doc])
+			score[each_doc] = term_frequency_doc * inverse_document_frequency[key] * tf_idf_query[key]
 
-	print(score)
-	# print(term_frequency_query)
-	# print(inverse_document_frequency)
-	# print(tf_idf_query)
-
+	print('tf',term_frequency_query)
+	print('idf',inverse_document_frequency)
+	print('tf-idf',tf_idf_query)
+	print('score',score)
+	# score = np.array(score)
+	print(heapq.nlargest(5, range(len(score)), score.__getitem__))
 
 main()
