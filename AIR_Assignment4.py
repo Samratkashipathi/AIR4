@@ -28,8 +28,6 @@ def preProcessing(content):
 def buildIndex(index, doc_id, tokens):
 	for word in tokens:
 		if(word not in index):
-			# index[word] = [1,{doc_id:1}]
-
 			#df,tf,{doc_id:frequency}
 			index[word] = [1,1,{doc_id:1}]
 			length[doc_id] = length[doc_id]+1
@@ -51,7 +49,7 @@ def buildIndex(index, doc_id, tokens):
 def main():
 	file_name = 'cran.all.1400'
 	# file_name = 'test.all.1'
-	
+	cosine_file = open('cosine.txt','w')
 	with open(file_name) as f:
 	    data = f.read()
 
@@ -59,8 +57,10 @@ def main():
 	del(doc[0])
 	print('Total Documents:',len(doc))
 	index = {}
+	doc_names = [''] * (len(doc)+1)
 	for i in range(len(doc)):
 		doc_id = doc[i].split('.T')[0]
+		doc_names[i] = doc[i].split('.T')[1]
 		content = doc[i].split('.W')[1]
 		tokens = preProcessing(content)
 		index = buildIndex(index, int(doc_id), tokens)
@@ -86,7 +86,7 @@ def main():
 
 		score = [0.0] * (len(doc)+1)
 		# print(length)
-
+		cosine_normalization_doc = [0] * (len(doc)+1)
 		inverse_document_frequency = {}
 		tf_idf_query = {}
 		for key in term_frequency_query.keys():
@@ -99,17 +99,18 @@ def main():
 			for each_doc in index[key][2].keys():
 				# print(each_doc,index[key][2][each_doc])
 				term_frequency_doc = 1 + math.log10(index[key][2][each_doc])
+				cosine_normalization_doc[each_doc] = cosine_normalization_doc[each_doc] + (term_frequency_doc * term_frequency_doc)
 				score[each_doc] = score[each_doc]+(term_frequency_doc * inverse_document_frequency[key] * tf_idf_query[key])
 
 		for i in range(1,len(score)):
-			if(score[i]!=0 or length[i]!=0):
+			if(score[i]!=0 or length[i]!=0 or cosine_normalization_doc[i]!=0):
 				score[i] = score[i]/length[i]
+				# cosine_file.write(str(i)+':'+str(score[i])+'\n')
+				# if(math.ceil(math.sqrt(cosine_normalization_doc[i])) == 0):
+				# 	score[i] = score[i]
+				# else:
+				# 	score[i] = score[i] / math.ceil(math.sqrt(cosine_normalization_doc[i]))
 
-		# print('tf',term_frequency_query)
-		# print('idf',inverse_document_frequency)
-		# print('tf-idf',tf_idf_query)
-		# print('score',score)
-		# score = np.array(score)
 		print(heapq.nlargest(10, range(len(score)), score.__getitem__))
 		# print((-score).argsort()[:10])
 
